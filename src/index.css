@@ -1,0 +1,38 @@
+/* Reset */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Body */
+
+body {
+  font-family: "Inter", sans-serif;
+  background: #08111f;
+  color: #f8fafc;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Links */
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Buttons */
+
+button {
+  font-family: inherit;
+}
+
+/* Inputs */
+
+input,
+textarea,
+select {
+  font-family: inherit;
+}
