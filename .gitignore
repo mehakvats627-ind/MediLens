@@ -1,1 +1,4 @@
-
+node_modules/
+.env
+first.env
+uploads/

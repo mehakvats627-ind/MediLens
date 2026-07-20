@@ -2,26 +2,22 @@ const mongoose = require("mongoose");
 
 const reportSchema = new mongoose.Schema(
   {
-    patientName: {
+    fileName: {
       type: String,
       required: true,
     },
-    age: {
-      type: Number,
-      required: true,
-    },
-    reportType: {
+    extractedText: {
       type: String,
       required: true,
     },
-    aiResult: {
+    explanation: {
       type: String,
       required: true,
     },
     userId: {
-  type: mongoose.Schema.Types.ObjectId,
-  ref: "User"
-}
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    }
   },
   {
     timestamps: true,

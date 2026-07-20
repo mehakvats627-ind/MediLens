@@ -17,6 +17,7 @@ const createReport = async (req, res) => {
     }
 };
 
+
 // Get All Reports
 const getReports = async (req, res) => {
     try {
@@ -62,12 +63,7 @@ const updateReport = async (req, res) => {
     }
 };
 
-module.exports = {
-    createReport,
-    getReports,
-    updateReport,
-    deleteReport
-};
+
 // Delete Report
 const deleteReport = async (req, res) => {
     try {
@@ -91,4 +87,10 @@ const deleteReport = async (req, res) => {
             message: error.message
         });
     }
+};
+module.exports = {
+    createReport,
+    getReports,
+    updateReport,
+    deleteReport
 };
