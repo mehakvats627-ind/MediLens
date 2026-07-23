@@ -11,7 +11,7 @@ console.log(Report.schema.obj);
 
 const auth = require("./middleware/auth");
 
-const extractText = require("./services/ocrService");
+const extractText = require("./services/ocrservice");
 
 const app = express();
 
