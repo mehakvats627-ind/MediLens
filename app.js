@@ -6,7 +6,7 @@ require("dotenv").config();
 require("./db");
 
 const User = require("./models/users");
-const Report = require("./models/Report");
+const Report = require("./models/report");
 console.log(Report.schema.obj);
 
 const auth = require("./middleware/auth");
