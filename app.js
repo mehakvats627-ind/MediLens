@@ -18,6 +18,10 @@ const app = express();
 
 app.use(express.json());
 
+app.get("/", (req, res) => {
+  res.send("MediLens Backend is Running ✅");
+});s
+
 
 // ===============================
 // OPENROUTER AI FUNCTION
