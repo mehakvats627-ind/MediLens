@@ -1,11 +1,12 @@
 const Tesseract = require("tesseract.js");
 
 async function extractText(imagePath) {
-    const result = awai
-    return result.data.text;
-}
-
-module.exports = extractText;t Tesseract.recognize(
+    const result = await Tesseract.recognize(
         imagePath,
         "eng"
     );
+
+    return result.data.text;
+}
+
+module.exports = extractText;
