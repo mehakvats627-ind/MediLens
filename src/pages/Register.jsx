@@ -2,7 +2,7 @@ import "../styles/login.css";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-
+import api from "../api";
 function Register() {
   const navigate = useNavigate();
 
@@ -11,15 +11,31 @@ function Register() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleRegister = () => {
-    if (name === "" || email === "" || password === "") {
-      alert("Please fill all fields");
-      return;
-    }
+  
+const handleRegister = async () => {
+  if (name === "" || email === "" || password === "") {
+    alert("Please fill all fields");
+    return;
+  }
+
+  try {
+    await api.post("/signup", {
+      name,
+      email,
+      password,
+    });
 
     alert("Registration Successful!");
     navigate("/");
-  };
+  } catch (error) {
+  console.log(error);
+  console.log(error.response?.data);
+
+  alert(
+    JSON.stringify(error.response?.data || error.message)
+  );
+}
+};
 
   return (
     <div className="login-page">
@@ -115,7 +131,10 @@ function Register() {
       </div>
 
     </div>
-  );
+  
+            
+            );
+            
 }
 
 export default Register;

@@ -2,6 +2,7 @@ import "../styles/login.css";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import api from "../api";
 
 function Login() {
   const navigate = useNavigate();
@@ -10,14 +11,31 @@ function Login() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleLogin = () => {
-    if (email === "" || password === "") {
-      alert("Please fill all fields");
-      return;
-    }
+  const handleLogin = async () => {
+  if (email === "" || password === "") {
+    alert("Please fill all fields");
+    return;
+  }
+
+  try {
+    const response = await api.post("/login", {
+      email,
+      password,
+    });
+
+    // JWT token save
+    localStorage.setItem("token", response.data.token);
+
+    alert("Login Successful!");
 
     navigate("/dashboard");
-  };
+  } catch (error) {
+  console.log(error.response?.data);
+  console.log(error);
+
+  alert(error.response?.data?.message || error.message);
+}
+};
 
   return (
     <div className="login-page">

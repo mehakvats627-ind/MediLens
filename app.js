@@ -6,6 +6,8 @@ require("dotenv").config();
 
 connectMongoDB();
 
+console.log("API Key exists:", !!process.env.OPENROUTER_API_KEY);
+
 const User = require("./models/users");
 const Report = require("./models/report");
 console.log(Report.schema.obj);
@@ -13,9 +15,11 @@ console.log(Report.schema.obj);
 const auth = require("./middleware/auth");
 
 const extractText = require("./services/ocrservice");
-
+const cors = require("cors");
 const app = express();
 
+app.use(cors());
+app.use(express.json());
 
 app.use(express.json());
 
