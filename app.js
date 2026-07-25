@@ -1,9 +1,10 @@
 const express = require("express");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const connectMongoDB = require("./db");
 require("dotenv").config();
 
-require("./db");
+connectMongoDB();
 
 const User = require("./models/users");
 const Report = require("./models/report");
