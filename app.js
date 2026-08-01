@@ -221,70 +221,113 @@ app.post("/upload", upload.single("report"), async (req, res) => {
 
         // OpenRouter AI Call
         const aiResponse = await axios.post(
-            "https://openrouter.ai/api/v1/chat/completions",
-            {
-                model: "openai/gpt-4o-mini",
+  "https://openrouter.ai/api/v1/chat/completions",
+  {
+    model: "google/gemini-2.0-flash-exp:free",
+    messages: [
+      {
+        role: "system",
+        content: `
+You are an expert AI Medical Assistant.
 
-                messages: [
-                    {
-                        role: "system",
-                        content:
-                        "You are a medical report assistant. Explain reports in simple language. Give disclaimer that this is not a diagnosis."
-                    },
-                    {
-                        role: "user",
-                        content:
-                        `Explain this medical report:\n${extractedText}`
-                    }
-                ]
-            },
-            {
-                headers: {
-                    Authorization:
-                    `Bearer ${process.env.OPENROUTER_API_KEY}`,
+Analyze the medical report carefully.
 
-                    "Content-Type":
-                    "application/json"
-                }
-            }
-        );
+Return ONLY valid JSON.
 
+Format:
 
-        const explanation =
-        aiResponse.data.choices[0].message.content;
+{
+  "status": "Normal",
+  "summary": "Explain the report in simple English.",
+  "abnormalValues": [
+    {
+      "test": "Test Name",
+      "value": "Result",
+      "reason": "Why it is abnormal"
+    }
+  ],
+  "normalValues": [
+    {
+      "test": "Test Name",
+      "value": "Result"
+    }
+  ],
+  "disclaimer": "This is not a diagnosis. Please consult a qualified doctor."
+}
+
+Rules:
+- status must be ONLY one of:
+Normal
+Low
+High
+Critical
+
+- If no abnormal values exist, return an empty array.
+- If OCR text is incomplete, mention that in the summary.
+- Do NOT use markdown.
+- Do NOT write \`\`\`json.
+- Return ONLY valid JSON.
+        `,
+      },
+      {
+        role: "user",
+        content: `Medical Report:
+
+${extractedText}`,
+      },
+    ],
+  },
+  {
+    headers: {
+      Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
+      "Content-Type": "application/json",
+    },
+  }
+);
+     const aiResult = JSON.parse(
+    aiResponse.data.choices[0].message.content
+);
+
+const explanation = aiResult.summary;
+const status = aiResult.status;
+const abnormalValues = aiResult.abnormalValues;
+const normalValues = aiResult.normalValues;const disclaimer = aiResult.disclaimer;
 
 await Report.create({
     fileName: req.file.originalname,
-    extractedText: extractedText,
-    explanation: explanation
+    extractedText,
+    explanation,
+    status,
+    abnormalValues,
+    normalValues,
+    disclaimer
 });
         fs.unlinkSync(filePath);
-
-
-        res.json({
-            success:true,
-            extractedText,
-            explanation
-        });
-
-
-    } catch(error){
-
-        console.log(error.message);
-
-        res.status(500).json({
-            success:false,
-            message:error.message
-        });
-
-    }
-
+     res.json({
+    success: true,
+    extractedText,
+    explanation,
+    status,
+    abnormalValues,
+    normalValues,
+    disclaimer
 });
 
+} catch(error){
+
+    console.log(error.message);
+
+    res.status(500).json({
+        success:false,
+        message:error.message
+    });
+
+  }
+
+});
 // ===============================
 // GET ALL REPORTS
 // ===============================
-
 app.get("/reports", async (req, res) => {
 
     try {

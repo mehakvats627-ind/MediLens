@@ -6,8 +6,26 @@ import {
   FaPrint,
 } from "react-icons/fa";
 import { jsPDF } from "jspdf";
+import { useLocation } from "react-router-dom";
 
 function Results() {
+  const location = useLocation();
+
+const report = location.state || {};
+
+const explanation = report.explanation || "No AI analysis available.";
+
+const extractedText = report.extractedText || "No extracted text available.";
+
+const status = report.status || "Normal";
+
+const abnormalValues = report.abnormalValues || [];
+
+const normalValues = report.normalValues || [];
+
+const disclaimer =
+  report.disclaimer ||
+  "This is not a diagnosis. Please consult a qualified doctor.";
 
   const downloadPDF = () => {
 
@@ -24,29 +42,38 @@ function Results() {
 
     doc.text("Health Status:", 20, 50);
     doc.setTextColor(0, 150, 0);
-    doc.text("NORMAL", 60, 50);
+    doc.text(status.toUpperCase(), 60, 50);
 
     doc.setTextColor(0, 0, 0);
 
-    doc.text("Diagnosis:", 20, 70);
-    doc.text(
-      "No major abnormalities were detected in the uploaded report.",
-      20,
-      80
-    );
+    doc.text("AI Summary:", 20, 70);
+
+doc.text(
+  explanation.substring(0, 100),
+  20,
+  80
+);
+
 
     doc.text("AI Summary:", 20, 100);
 
     doc.text(
-      [
-        "Blood pressure is within normal range.",
-        "Blood sugar level is normal.",
-        "Cholesterol level is normal.",
-        "Heart rate is stable.",
-      ],
-      20,
-      110
+  [
+   explanation.substring(0,100),
+  ],
+   20,
+   110
+  );
+
+    doc.text("Abnormal Values:",20,140);
+
+    abnormalValues.forEach((item,index)=>{
+    doc.text(
+    `${item.test}: ${item.value}`,
+    20,
+    150 + index*10
     );
+  });
 
     doc.text("Recommendations:", 20, 145);
 
@@ -90,12 +117,14 @@ function Results() {
           </h2>
 
           <span className="normal">
-            🟢 Normal
+          {status === "Normal" ? "🟢" :
+         status === "Low" ? "🟡" :
+         status === "High" ? "🟠" :
+         "🔴"} {status}
           </span>
 
           <p>
-            No major abnormalities were detected in your medical report.
-            Overall health indicators are within the normal range.
+            AI analyzed health status based on uploaded medical report.
           </p>
 
         </div>
@@ -103,14 +132,41 @@ function Results() {
         <div className="result-box">
 
           <h2>📋 AI Summary</h2>
-
-          <p>
-            Blood pressure, glucose level and cholesterol values appear
-            to be normal. No immediate medical concern has been identified
-            from the uploaded report.
-          </p>
+          <p>{explanation}</p>
 
         </div>
+          <div className="result-box">
+
+         <h2>⚠️ Abnormal Values</h2>
+
+         <ul>
+        {
+         abnormalValues.length > 0 ? (
+         abnormalValues.map((item,index)=>(
+         <li key={index}>
+         <b>{item.test}</b> : {item.value}
+         <br/>
+          Reason: {item.reason}
+         </li>
+         ))
+         )
+         :
+         (
+         <li>No abnormal values found</li>
+         )
+         }
+
+         </ul>
+
+         </div>
+         
+         <div className="result-box">
+
+           <h2>📄 Extracted Report Text</h2>
+
+            <p>{extractedText}</p>
+
+         </div>
 
         <div className="result-box">
 
@@ -119,11 +175,18 @@ function Results() {
           </h2>
 
           <ul>
-            <li>✔ Blood Pressure : Normal</li>
-            <li>✔ Blood Sugar : Normal</li>
-            <li>✔ Cholesterol : Normal</li>
-            <li>✔ Heart Rate : Stable</li>
-          </ul>
+         {
+          normalValues.length > 0 ? (
+          normalValues.map((item,index)=>(
+          <li key={index}>
+          ✔ {item.test} : {item.value}
+        </li>
+       ))
+        ) : (
+       <li>No normal values detected</li>
+       )
+       }
+       </ul>
 
         </div>
 
@@ -140,6 +203,15 @@ function Results() {
           </ul>
 
         </div>
+        <div className="result-box">
+
+        <h2>⚠️ Disclaimer</h2>
+
+       <p>
+       {disclaimer}
+       </p>
+
+       </div>
 
         <div className="result-buttons">
 

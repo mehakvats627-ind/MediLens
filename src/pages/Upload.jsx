@@ -2,28 +2,48 @@ import "../styles/upload.css";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaCloudUploadAlt } from "react-icons/fa";
-
+import api from "../api";
+ 
 function Upload() {
   const navigate = useNavigate();
 
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const handleUpload = () => {
-    if (!file) {
-      alert("Please select a medical report first.");
-      return;
-    }
+const handleUpload = async () => {
+  if (!file) {
+    alert("Please select a file to upload");
+    return;
+  }
 
-    setLoading(true);
+  setLoading(true);
 
-    // Fake AI Processing
-    setTimeout(() => {
-      setLoading(false);
-      navigate("/results");
-    }, 3000);
-  };
+  try {
+    const formData = new FormData();
+    formData.append("report", file);
 
+    const response = await api.post("/upload", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    console.log(response.data);
+
+    setLoading(false);
+
+    alert("Report Uploaded Successfully!");
+
+    navigate("/results", {
+      state: response.data,
+    });
+
+  } catch (error) {
+    setLoading(false);
+
+    alert(error.response?.data?.message || "Upload Failed");
+  }
+};
   return (
     <div className="upload-page">
       <div className="upload-card">

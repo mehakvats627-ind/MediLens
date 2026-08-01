@@ -1,44 +1,66 @@
 import "../styles/history.css";
 import { useNavigate } from "react-router-dom";
-import { FaSearch, FaEye } from "react-icons/fa";
-import { useState } from "react";
+import { FaSearch, FaEye, FaTrash} from "react-icons/fa";
+import { useState , useEffect } from "react";
+import api from "../api";
 
 function History() {
   const navigate = useNavigate();
 
-  const reports = [
-    {
-      id: 1,
-      name: "Blood Test Report",
-      date: "20 June 2026",
-      status: "Normal",
-    },
-    {
-      id: 2,
-      name: "CBC Report",
-      date: "18 June 2026",
-      status: "Abnormal",
-    },
-    {
-      id: 3,
-      name: "X-Ray Report",
-      date: "15 June 2026",
-      status: "Normal",
-    },
-    {
-      id: 4,
-      name: "MRI Scan",
-      date: "10 June 2026",
-      status: "Pending",
-    },
-  ];
+  const [reports, setReports] = useState([]);
+
+  useEffect(() => {
+  const fetchReports = async () => {
+    try {
+      const response = await api.get("/reports");
+      setReports(response.data.data);
+    } catch (error) {
+      console.log(error);
+      alert("Failed to load reports");
+    }
+  };
+
+  fetchReports();
+}, []);
 
   const [search, setSearch] = useState("");
 
   const filteredReports = reports.filter((report) =>
-    report.name.toLowerCase().includes(search.toLowerCase())
+  (
+    report.fileName ||
+    report.status ||
+    report.explanation ||
+    ""
+  )
+    .toLowerCase()
+    .includes(search.toLowerCase())
+);
+
+const deleteReport = async (id) => {
+
+  const confirmDelete = window.confirm(
+    "Are you sure you want to delete this report?"
   );
 
+  if (!confirmDelete) return;
+
+  try {
+
+    await api.delete(`/reports/${id}`);
+
+    setReports(reports.filter((report) => report._id !== id));
+
+    alert("Report deleted successfully");
+
+  } catch (error) {
+
+    console.log(error);
+
+    alert("Delete failed");
+
+  }
+
+};
   return (
     <div className="history-page">
       <div className="history-card">
@@ -71,11 +93,11 @@ function History() {
 
             {filteredReports.length > 0 ? (
               filteredReports.map((report) => (
-                <tr key={report.id}>
+                <tr key={report._id}>
 
-                  <td>{report.name}</td>
+                  <td>{report.fileName}</td>
 
-                  <td>{report.date}</td>
+                  <td>{new Date(report.createdAt).toLocaleDateString()}</td>
 
                   <td>
                     <span
@@ -92,10 +114,28 @@ function History() {
                   </td>
 
                   <td>
-                    <button onClick={() => navigate("/results")}>
-                      <FaEye /> View
-                    </button>
-                  </td>
+
+<button
+onClick={() =>
+navigate("/results", {
+state: report,
+})
+}
+>
+<FaEye /> View
+</button>
+
+<button
+onClick={() => deleteReport(report._id)}
+style={{
+marginLeft:"10px",
+background:"#dc3545"
+}}
+>
+<FaTrash /> Delete
+</button>
+
+</td>
 
                 </tr>
               ))
