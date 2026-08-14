@@ -1,3 +1,4 @@
 node_modules/
 first.env
 uploads/
+.env
