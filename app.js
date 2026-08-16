@@ -223,11 +223,11 @@ app.post("/upload", upload.single("report"), async (req, res) => {
         const aiResponse = await axios.post(
   "https://openrouter.ai/api/v1/chat/completions",
   {
-    model: "google/gemini-2.0-flash-exp:free",
-    messages: [
-      {
-        role: "system",
-        content: `
+  model: "openrouter/free",
+  messages: [
+    {
+      role: "system",
+      content: `
 You are an expert AI Medical Assistant.
 
 Analyze the medical report carefully.
